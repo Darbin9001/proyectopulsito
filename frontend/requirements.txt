@@ -1,0 +1,18 @@
+# Flask Framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# Base de datos MongoDB
+pymongo==4.6.0
+
+# Variables de entorno
+python-dotenv==1.0.0
+
+# Cliente HTTP
+requests==2.31.0
+
+# Seguridad y hashing de contraseñas
+bcrypt==4.1.2
+
+# Certificados SSL
+certifi==2023.11.17

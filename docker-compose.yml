@@ -1,0 +1,60 @@
+services:
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5000:5000"
+    environment:
+      - API_GATEWAY_URL=http://api-gateway:8000
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - NAME1_SERVICE_URL=http://service1-service:8002
+      - NAME2_SERVICE_URL=http://service2-service:8003
+      - NAME3_SERVICE_URL=http://service3-service:8004
+    depends_on:
+      - auth-service
+      - service1-service
+      - service2-service
+      - service3-service
+
+  auth-service:
+    build: ./services/authentication
+    container_name: auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=${DB_NAME}
+
+  service1-service:
+    build: ./services/service1
+    container_name: service1-service
+    ports:
+      - "8002:8002"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=${DB_NAME}
+
+  service2-service:
+    build: ./services/service2
+    container_name: service2-service
+    ports:
+      - "8003:8003"
+    environment:
+      - NAME1_SERVICE_URL=http://service1-service:8002/health-data
+
+  service3-service:
+    build: ./services/service3
+    container_name: service3-service
+    ports:
+      - "8004:8004"
+
+# No se requieren volúmenes para bases de datos locales si usas Atlas

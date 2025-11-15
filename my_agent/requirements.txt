@@ -1,0 +1,15 @@
+# Google ADK (Agent Development Kit)
+google-adk>=0.1.0
+google-genai>=0.2.0
+
+# Telegram Bot
+python-telegram-bot>=21.0
+
+# HTTP Requests
+requests>=2.31.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Opcional pero recomendado para desarrollo
+# httpx>=0.27.0  # Para requests asíncronos más eficientes

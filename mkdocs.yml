@@ -1,0 +1,38 @@
+site_name: Sistema de Monitoreo de Salud
+site_description: Proyecto universitario basado en microservicios con Flask y FastAPI
+site_author: Darbin9001
+repo_url: https://github.com/Darbin9001/plantilla-proyecto.git
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+      primary: teal
+      accent: light blue
+
+nav:
+  - Inicio: index.md
+  - Documentación:
+      - Introducción: index.md
+      - Diagramas UML:
+          - Casos de Uso: uml/casos_uso.md
+          - Clases: uml/clases.md
+          - Secuencia: uml/secuencia.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search

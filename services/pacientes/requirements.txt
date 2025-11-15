@@ -1,0 +1,21 @@
+# FastAPI y servidor
+fastapi==0.104.1
+uvicorn==0.24.0
+
+# Base de datos MongoDB
+pymongo==4.6.0
+
+# Validación de datos
+pydantic==2.5.0
+
+# Variables de entorno
+python-dotenv==1.0.0
+
+# Cliente HTTP (para generate_auto_data.py)
+requests==2.31.0
+
+# Seguridad y hashing
+bcrypt==4.1.2
+
+# Certificados SSL
+certifi==2023.11.17
