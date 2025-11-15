@@ -1,7 +1,7 @@
 site_name: Sistema de Monitoreo de Salud
 site_description: Proyecto universitario basado en microservicios con Flask y FastAPI
 site_author: Darbin9001
-repo_url: https://github.com/Darbin9001/plantilla-proyecto.git
+repo_url: https://github.com/Darbin9001/proyectopulsito.git
 
 theme:
   name: material
