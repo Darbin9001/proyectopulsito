@@ -118,7 +118,7 @@ proyecto-seminario/
 
 ### 1. Clonar el Repositorio
 ```bash
-git clone https://github.com/Darbin9001/plantilla-proyecto.git
+git clone https://github.com/Darbin9001/proyectopulsito.git
 cd sistema-monitoreo-salud
 ```
 
