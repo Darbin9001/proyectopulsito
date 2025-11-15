@@ -60,25 +60,46 @@ El sistema está compuesto por varios módulos:
 
 ## 🧩 Estructura del Proyecto
 
-```plaintext
-sistema_monitoreo_salud/
+## Estructura del Proyecto
+```
+proyecto-seminario/
+├── frontend/                    # Aplicación web Flask
+│   ├── app.py                  # Servidor principal
+│   ├── templates/              # Plantillas HTML
+│   │   ├── login.html
+│   │   ├── registro.html
+│   │   ├── paciente_dashboard.html
+│   │   └── medico_dashboard.html
+│   ├── static/                 # Recursos estáticos
+│   │   ├── css/
+│   │   └── js/
+│   └── Dockerfile
 │
-├── api-gateway/
-├── common/
-├── frontend/
-├── services/
-│   ├── authentication/
-│   ├── vitales/
-│   ├── analisis/
-│   └── notificaciones/
+├── services/                    # Microservicios
+│   ├── data_base_mongo.py      # Módulo compartido MongoDB
+│   ├── utils.py                # Utilidades compartidas
+│   │
+│   ├── service1/               # Generador de signos vitales
+│   │   ├── main.py
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   │
+│   ├── service2/               # Análisis de datos
+│   │   ├── main.py
+│   │   ├── data_history.json
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   │
+│   └── pacientes/
+│       └── generate_auto_data.py  # Script de simulación
 │
-├── docs/
-│   ├── index.md
-│   └── uml/
-│       ├── casos_uso.iuml
-│       ├── clases.iuml
-│       ├── secuencia.iuml
+├── my_agent/                   # Agente conversacional
+│   ├── agent.py               # Configuración Gemini
+│   ├── telegram_bot.py        # Bot de Telegram
+│   ├── health_data.py         # Integración con Service2
+│   └── requirements.txt
 │
-├── docker-compose.yml
-├── mkdocs.yml
+├── .env                       # Variables de entorno
+├── docker-compose.yml         # Orquestación (opcional)
 └── README.md
+```
