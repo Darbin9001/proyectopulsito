@@ -2,8 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import random
 from datetime import datetime
-from data_base_mongo import db
-from utils import serialize_mongo
+from services.data_base_mongo import db
+from services.utils import serialize_mongo
 from typing import Optional
 
 app = FastAPI(title="Servicio 1 - Generador de Datos de Salud")

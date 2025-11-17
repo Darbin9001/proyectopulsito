@@ -1,16 +1,34 @@
+version: '3.8'
+
 services:
+
+  # ======================
+  # 🖥️ Frontend
+  # ======================
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: frontend
     ports:
       - "5000:5000"
     environment:
       - API_GATEWAY_URL=http://api-gateway:8000
+      - MONGO_URI=${MONGO_URI}
+      - DB_NAME=${DB_NAME}
+      - TZ=America/Bogota
     depends_on:
       - api-gateway
+    networks:
+      - app-network
 
+  # ======================
+  # 🔀 API Gateway
+  # ======================
   api-gateway:
-    build: ./api-gateway
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
     container_name: api-gateway
     ports:
       - "8000:8000"
@@ -18,43 +36,107 @@ services:
       - AUTH_SERVICE_URL=http://auth-service:8001
       - NAME1_SERVICE_URL=http://service1-service:8002
       - NAME2_SERVICE_URL=http://service2-service:8003
-      - NAME3_SERVICE_URL=http://service3-service:8004
+      - TZ=America/Bogota
     depends_on:
       - auth-service
       - service1-service
       - service2-service
-      - service3-service
+    networks:
+      - app-network
 
+  # ======================
+  # 🔐 Servicio de Autenticación
+  # ======================
   auth-service:
-    build: ./services/authentication
+    build:
+      context: .
+      dockerfile: services/authentication/Dockerfile
     container_name: auth-service
     ports:
       - "8001:8001"
     environment:
       - MONGO_URI=${MONGO_URI}
       - DB_NAME=${DB_NAME}
+      - TZ=America/Bogota
+    networks:
+      - app-network
 
+  # ======================
+  # 🩺 Servicio 1 (Pacientes)
+  # ======================
   service1-service:
-    build: ./services/service1
+    build:
+      context: .
+      dockerfile: services/service1/Dockerfile
     container_name: service1-service
     ports:
       - "8002:8002"
     environment:
       - MONGO_URI=${MONGO_URI}
       - DB_NAME=${DB_NAME}
+      - TZ=America/Bogota
+    networks:
+      - app-network
 
+  # ======================
+  # 📊 Servicio 2 (Análisis)
+  # ======================
   service2-service:
-    build: ./services/service2
+    build:
+      context: .
+      dockerfile: services/service2/Dockerfile
     container_name: service2-service
     ports:
       - "8003:8003"
     environment:
-      - NAME1_SERVICE_URL=http://service1-service:8002/health-data
+      - NAME1_SERVICE_URL=http://service1-service:8002
+      - TZ=America/Bogota
+    volumes:
+      - ./data_history.json:/app/data_history.json
+    networks:
+      - app-network
 
-  service3-service:
-    build: ./services/service3
-    container_name: service3-service
-    ports:
-      - "8004:8004"
+  # ======================
+  # 🤖 Agente de Telegram
+  # ======================
+  telegram-agent:
+    build:
+      context: .
+      dockerfile: my_agent/Dockerfile
+    container_name: telegram-agent
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - SERVICE2_URL=http://service2-service:8003
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - TZ=America/Bogota
+    depends_on:
+      - service2-service
+    networks:
+      - app-network
+    restart: unless-stopped
 
-# No se requieren volúmenes para bases de datos locales si usas Atlas
+  # ======================
+  # 🧪 Generador Automático de Datos
+  # ======================
+  data-generator:
+    build:
+      context: .
+      dockerfile: services/pacientes/Dockerfile
+    container_name: data-generator
+    environment:
+      - SERVICE1_URL=http://service1-service:8002/health-data
+      - SERVICE2_URL=http://service2-service:8003/analyze
+      - TZ=America/Bogota
+    depends_on:
+      - service1-service
+      - service2-service
+    networks:
+      - app-network
+    restart: unless-stopped
+
+# ======================
+# 🌐 Red
+# ======================
+networks:
+  app-network:
+    driver: bridge

@@ -2,22 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copiar requirements primero (mejor cache)
-COPY requirements.txt .
+# Mejorar compatibilidad con requests
+RUN apt-get update && apt-get install -y curl && apt-get clean
+
+COPY services/pacientes/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar archivos del servicio
-COPY . .
+COPY services/pacientes/generate_auto_data.py .
 
-# Copiar módulos compartidos
-COPY ../data_base_mongo.py /app/services/
-COPY ../utils.py /app/services/
-
-# Variables de entorno por defecto
 ENV PYTHONUNBUFFERED=1
 
-# Exponer puerto
-EXPOSE 8003
-
-# Comando de inicio
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003"]
+CMD ["python", "generate_auto_data.py"]

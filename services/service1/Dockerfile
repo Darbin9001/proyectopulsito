@@ -1,19 +1,21 @@
+# services/service1/Dockerfile
+# ==========================================
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Instalar dependencias
-COPY requirements.txt .
+# Copiar requirements desde el servicio
+COPY services/service1/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar código del servicio
-COPY . .
+# Copiar módulos compartidos desde services/
+COPY services/data_base_mongo.py services/utils.py ./
 
-# Copiar módulos compartidos desde la carpeta padre
-COPY ../data_base_mongo.py ../utils.py ./services/
+# Copiar código del servicio
+COPY services/service1/ .
 
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 8001
+EXPOSE 8002
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]

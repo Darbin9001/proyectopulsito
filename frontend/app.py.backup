@@ -5,18 +5,18 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# No es necesario agregar rutas porque data_base_mongo.py está en /app/
+# Agregar el directorio services al path para importar
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Importar funciones de tu módulo de base de datos existente
-import data_base_mongo as db_mongo
+from services import data_base_mongo as db_mongo
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'clave_secreta_cambiar_en_produccion')
 
-SERVICE2_URL = os.getenv('SERVICE2_URL', 'http://service2-service:8003/historial')
+SERVICE2_URL = os.getenv('SERVICE2_URL', 'http://127.0.0.1:8002/historial')
 
 # Decorador para requerir login
 def login_required(f):
@@ -99,7 +99,7 @@ def registro_page():
 
 @app.route("/registro", methods=['POST'])
 def registro():
-    """Procesa el registro de nuevos usuarios (pacientes y médicos)"""
+    """Procesa el registro de nuevos pacientes"""
     data = request.get_json()
     cedula = data.get('cedula')
     nombre = data.get('nombre')
@@ -109,36 +109,28 @@ def registro():
     telefono = data.get('telefono')
     telegram_user_id = data.get('telegram_user_id', '')
     password = data.get('password')
-    rol = data.get('rol', 'paciente')  # Obtener el rol del formulario
-    especialidad = data.get('especialidad', '')  # Obtener especialidad para médicos
     
-    # Validaciones básicas
     if not all([cedula, nombre, email, telefono, password]):
         return jsonify({"success": False, "message": "Faltan datos obligatorios"}), 400
     
-    # Validación específica para médico
-    if rol == 'medico' and not especialidad:
-        return jsonify({"success": False, "message": "La especialidad es obligatoria para médicos"}), 400
-    
     try:
-        # Verificar si ya existe
+        # Verificar si ya existe usando tu función
         if db_mongo.usuario_existe(cedula):
             return jsonify({"success": False, "message": "La cédula ya está registrada"}), 400
         
-        # Crear usuario con el rol correcto
+        # Crear usuario usando tu función con todos los campos
         if db_mongo.crear_usuario(
             cedula=cedula, 
             nombre=nombre, 
             email=email, 
             telefono=telefono, 
             password=password, 
-            rol=rol,  # Pasar el rol seleccionado
-            especialidad=especialidad if rol == 'medico' else None,  # Solo médicos tienen especialidad
+            rol='paciente',
             apellido=apellido,
-            fecha_nacimiento=fecha_nacimiento if rol == 'paciente' else '',
-            telegram_user_id=telegram_user_id if rol == 'paciente' else ''
+            fecha_nacimiento=fecha_nacimiento,
+            telegram_user_id=telegram_user_id
         ):
-            return jsonify({"success": True, "message": f"Registro exitoso como {rol}"})
+            return jsonify({"success": True, "message": "Registro exitoso"})
         else:
             return jsonify({"success": False, "message": "Error al registrar usuario"}), 500
             
@@ -217,5 +209,5 @@ def inicializar_db():
 
 if __name__ == "__main__":
     print("🚀 Iniciando servidor Flask...")
-    print(f"📊 Usando conexión MongoDB desde data_base_mongo.py")
-    app.run(debug=True, host='0.0.0.0', port=5000)  # Puerto 5000, no 8080
+    print(f"📊 Usando conexión MongoDB desde services/data_base_mongo.py")
+    app.run(debug=True, host='0.0.0.0', port=8080)

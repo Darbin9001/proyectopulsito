@@ -54,6 +54,47 @@
       font-size: 0.9em;
     }
 
+    .role-selector {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .role-option {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .role-option:hover {
+      border-color: #667eea;
+      background: #f5f7ff;
+    }
+
+    .role-option.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .role-option input[type="radio"] {
+      display: none;
+    }
+
+    .role-icon {
+      font-size: 2em;
+      margin-bottom: 5px;
+    }
+
+    .role-label {
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+
     .form-row {
       display: flex;
       gap: 15px;
@@ -76,7 +117,8 @@
       font-weight: 600;
     }
 
-    .form-group input {
+    .form-group input,
+    .form-group select {
       width: 100%;
       padding: 12px 15px;
       border: 2px solid #e0e0e0;
@@ -85,7 +127,8 @@
       transition: all 0.3s;
     }
 
-    .form-group input:focus {
+    .form-group input:focus,
+    .form-group select:focus {
       outline: none;
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -163,16 +206,40 @@
     .required {
       color: #f44336;
     }
+
+    /* Campos específicos para médico */
+    .medico-only {
+      display: none;
+    }
+
+    .medico-only.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <div class="register-container">
     <div class="logo">
       <h1>🩺 Monitor de salud</h1>
-      <p>Registro de Nuevo Paciente</p>
+      <p>Registro de Nuevo Usuario</p>
     </div>
 
     <div id="alert" class="alert hidden"></div>
+
+    <!-- Selector de Rol -->
+    <div class="role-selector">
+      <label class="role-option active">
+        <input type="radio" name="rol" value="paciente" checked />
+        <div class="role-icon">🧑‍⚕️</div>
+        <div class="role-label">Paciente</div>
+      </label>
+      
+      <label class="role-option">
+        <input type="radio" name="rol" value="medico" />
+        <div class="role-icon">👨‍⚕️</div>
+        <div class="role-label">Médico</div>
+      </label>
+    </div>
 
     <form id="register-form">
       <div class="form-group">
@@ -183,8 +250,8 @@
           name="cedula" 
           placeholder="Número de cédula"
           required
-          pattern="[0-9]+"
-          title="Solo números"
+          pattern="[0-9a-zA-Z]+"
+          title="Solo números y letras"
         />
       </div>
 
@@ -201,25 +268,42 @@
         </div>
 
         <div class="form-group">
-          <label for="apellido">Apellido <span class="required">*</span></label>
+          <label for="apellido">Apellido</label>
           <input 
             type="text" 
             id="apellido" 
             name="apellido" 
             placeholder="Apellido"
-            required
           />
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="fecha_nacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+      <!-- Campo específico para pacientes -->
+      <div class="form-group paciente-only">
+        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
         <input 
           type="date" 
           id="fecha_nacimiento" 
-          name="fecha_nacimiento" 
-          required
+          name="fecha_nacimiento"
         />
+      </div>
+
+      <!-- Campo específico para médicos -->
+      <div class="form-group medico-only">
+        <label for="especialidad">Especialidad <span class="required">*</span></label>
+        <select id="especialidad" name="especialidad">
+          <option value="">Seleccione una especialidad</option>
+          <option value="Cardiología">Cardiología</option>
+          <option value="Medicina General">Medicina General</option>
+          <option value="Pediatría">Pediatría</option>
+          <option value="Neurología">Neurología</option>
+          <option value="Dermatología">Dermatología</option>
+          <option value="Ginecología">Ginecología</option>
+          <option value="Traumatología">Traumatología</option>
+          <option value="Oftalmología">Oftalmología</option>
+          <option value="Psiquiatría">Psiquiatría</option>
+          <option value="Otra">Otra</option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -246,7 +330,8 @@
         />
       </div>
 
-      <div class="form-group">
+      <!-- Campo solo para pacientes -->
+      <div class="form-group paciente-only">
         <label for="telegram_user_id">Telegram User ID</label>
         <input 
           type="text" 
@@ -291,6 +376,46 @@
   <script>
     const registerForm = document.getElementById('register-form');
     const alertDiv = document.getElementById('alert');
+    const roleOptions = document.querySelectorAll('.role-option');
+    const roleRadios = document.querySelectorAll('input[name="rol"]');
+    const pacienteFields = document.querySelectorAll('.paciente-only');
+    const medicoFields = document.querySelectorAll('.medico-only');
+
+    // Función para mostrar/ocultar campos según el rol
+    function toggleRoleFields(rol) {
+      if (rol === 'medico') {
+        pacienteFields.forEach(field => field.classList.add('hidden'));
+        medicoFields.forEach(field => field.classList.add('show'));
+        
+        // Hacer especialidad requerida
+        document.getElementById('especialidad').required = true;
+        document.getElementById('fecha_nacimiento').required = false;
+      } else {
+        pacienteFields.forEach(field => field.classList.remove('hidden'));
+        medicoFields.forEach(field => field.classList.remove('show'));
+        
+        // Hacer especialidad no requerida
+        document.getElementById('especialidad').required = false;
+        document.getElementById('fecha_nacimiento').required = false;
+      }
+    }
+
+    // Manejar selección de rol
+    roleOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        // Remover active de todos
+        roleOptions.forEach(opt => opt.classList.remove('active'));
+        // Agregar active al seleccionado
+        this.classList.add('active');
+        
+        // Seleccionar el radio button correspondiente
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+        
+        // Actualizar campos visibles
+        toggleRoleFields(radio.value);
+      });
+    });
 
     function showAlert(message, type = 'error') {
       alertDiv.textContent = message;
@@ -305,24 +430,29 @@
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      const rol = document.querySelector('input[name="rol"]:checked').value;
       const cedula = document.getElementById('cedula').value.trim();
       const nombre = document.getElementById('nombre').value.trim();
       const apellido = document.getElementById('apellido').value.trim();
-      const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
       const email = document.getElementById('email').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
-      const telegram_user_id = document.getElementById('telegram_user_id').value.trim();
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm-password').value;
 
-      // Validaciones
-      if (!cedula || !nombre || !apellido || !fecha_nacimiento || !email || !telefono || !password) {
+      // Campos específicos
+      const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
+      const telegram_user_id = document.getElementById('telegram_user_id').value.trim();
+      const especialidad = document.getElementById('especialidad').value;
+
+      // Validaciones básicas
+      if (!cedula || !nombre || !email || !telefono || !password) {
         showAlert('Por favor complete todos los campos obligatorios', 'error');
         return;
       }
 
-      if (!/^\d+$/.test(cedula)) {
-        showAlert('La cédula debe contener solo números', 'error');
+      // Validación específica para médico
+      if (rol === 'medico' && !especialidad) {
+        showAlert('Por favor seleccione una especialidad', 'error');
         return;
       }
 
@@ -341,40 +471,53 @@
         return;
       }
 
+      // Preparar datos según el rol
+      const data = {
+        cedula,
+        nombre,
+        email,
+        telefono,
+        password,
+        rol,
+        apellido
+      };
+
+      // Agregar campos específicos
+      if (rol === 'paciente') {
+        data.fecha_nacimiento = fecha_nacimiento;
+        data.telegram_user_id = telegram_user_id;
+      } else if (rol === 'medico') {
+        data.especialidad = especialidad;
+      }
+
       try {
         const response = await fetch('/registro', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
-            cedula, 
-            nombre, 
-            apellido,
-            fecha_nacimiento,
-            email, 
-            telefono, 
-            telegram_user_id,
-            password 
-          })
+          body: JSON.stringify(data)
         });
 
-        const data = await response.json();
+        const result = await response.json();
 
-        if (response.ok && data.success) {
-          showAlert('¡Registro exitoso! Redirigiendo al login...', 'success');
+        if (response.ok && result.success) {
+          showAlert(`¡Registro exitoso como ${rol}! Redirigiendo al login...`, 'success');
           
           setTimeout(() => {
             window.location.href = '/login';
           }, 2000);
         } else {
-          showAlert(data.message || 'Error al registrarse', 'error');
+          showAlert(result.message || 'Error al registrarse', 'error');
         }
       } catch (error) {
         showAlert('Error al conectar con el servidor', 'error');
         console.error('Error:', error);
       }
     });
+
+    // Inicializar vista
+    toggleRoleFields('paciente');
   </script>
 </body>
 </html>

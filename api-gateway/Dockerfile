@@ -1,17 +1,16 @@
 FROM python:3.12-slim
 
-# Establece el directorio de trabajo.
 WORKDIR /app
 
-# Copia el archivo de dependencias.
-COPY requirements.txt .
-
-# Instala las dependencias.
+# Copiar requirements desde api-gateway
+COPY api-gateway/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia el resto del código.
-COPY . .
+# Copiar código del api-gateway
+COPY api-gateway/ .
 
-# Define el comando para ejecutar la aplicación.
-# El puerto debe ser el mismo que se expone en docker-compose.yml (8000).
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 8000
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

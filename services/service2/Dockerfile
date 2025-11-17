@@ -2,13 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+# Copiar requirements desde el servicio
+COPY services/service2/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copiar módulos compartidos desde services/
+COPY services/data_base_mongo.py services/utils.py ./
+
+# Copiar el archivo data_history.json desde la raíz del proyecto
+COPY data_history.json ./
+
+# Copiar código del servicio
+COPY services/service2/ .
 
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 8002
+EXPOSE 8003
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003"]

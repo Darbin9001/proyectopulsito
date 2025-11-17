@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-SERVICE2_URL = os.getenv("SERVICE2_URL", "http://service2-service:8003")  # Service2 en puerto 8002
+SERVICE2_URL = "http://127.0.0.1:8002"  # Service2 en puerto 8002
 
 # Estados de conversación
 ESPERANDO_CEDULA, CONVERSACION_NORMAL = range(2)

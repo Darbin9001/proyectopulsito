@@ -1,3 +1,4 @@
+import os
 import requests
 import time
 import random
@@ -6,8 +7,8 @@ import random
 cedulas = ["123456789", "987654321", "456789123", "1060872570"]
 
 # URL de los servicios
-SERVICE1_URL = "http://127.0.0.1:8001/health-data"
-SERVICE2_URL = "http://127.0.0.1:8002/analyze"
+SERVICE1_URL = os.getenv("SERVICE1_URL", "http://service1-service:8002/health-data")
+SERVICE2_URL = os.getenv("SERVICE2_URL", "http://service2-service:8003/analyze")
 
 def generar_signos_vitales(cedula):
     """Envía datos aleatorios de signos vitales al microservicio 1 y los analiza en el 2"""

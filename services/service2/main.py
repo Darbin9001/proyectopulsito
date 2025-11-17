@@ -7,7 +7,7 @@ import os
 
 app = FastAPI(title="Servicio 2 - Análisis de Datos de Salud")
 
-SERVICE1_URL = os.getenv("NAME1_SERVICE_URL", "http://127.0.0.1:8001")
+SERVICE1_URL = os.getenv("NAME1_SERVICE_URL", "http://service1-service:8002")
 DATA_FILE = "data_history.json"
 data_history = {}  # Cambiar a diccionario para organizar por cédula
 
@@ -15,16 +15,23 @@ data_history = {}  # Cambiar a diccionario para organizar por cédula
 # --- Cargar historial previo si existe ---
 def load_data():
     global data_history
+    data_history = {}  # IMPORTANTE: Inicializar como diccionario vacío
+    
     if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            try:
-                data_history = json.load(f)
-                print(f"✅ Historial cargado ({sum(len(v) for v in data_history.values())} registros).")
-            except json.JSONDecodeError:
-                print("⚠️ Archivo JSON vacío o dañado, iniciando nuevo historial.")
-                data_history = {}
+        try:
+            with open(DATA_FILE, "r") as f:
+                loaded = json.load(f)
+                # Verificar que sea un diccionario
+                if isinstance(loaded, dict):
+                    data_history = loaded
+                    total = sum(len(v) for v in data_history.values())
+                    print(f"✅ Historial cargado ({total} registros).")
+                else:
+                    print("⚠️ Formato incorrecto en data_history.json, iniciando vacío")
+        except (json.JSONDecodeError, Exception) as e:
+            print(f"⚠️ Error leyendo archivo: {e}. Iniciando vacío.")
     else:
-        print("📁 No se encontró historial previo, iniciando nuevo archivo.")
+        print("📁 No se encontró historial previo, iniciando nuevo.")
 
 
 # --- Guardar historial en archivo ---
