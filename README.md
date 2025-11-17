@@ -270,6 +270,18 @@ GOOGLE_API_KEY=tu_api_key_de_google
 # Flask
 SECRET_KEY=clave_secreta_super_segura
 ```
+> ⚠️ **IMPORTANTE - Configuración de MongoDB Atlas:**
+> 
+> Si vas a desplegar este sistema en otro computador o servidor, **debes agregar la IP pública de esa máquina en la lista de IPs permitidas de MongoDB Atlas**, de lo contrario los servicios no podrán conectarse a la base de datos.
+>
+> **Pasos para configurar el acceso:**
+> 1. Accede a [MongoDB Atlas](https://cloud.mongodb.com/)
+> 2. Ve a tu cluster → **Network Access**
+> 3. Click en **Add IP Address**
+> 4. Agrega la IP pública del servidor/computador
+> 5. O selecciona **Allow Access from Anywhere** (0.0.0.0/0) para desarrollo
+>
+> 💡 **Tip:** Para encontrar tu IP pública, visita: https://www.whatismyip.com/
 
 ### 3️⃣ Levantar todos los servicios
 
